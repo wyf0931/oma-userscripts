@@ -7,7 +7,7 @@
 [![userscript](https://img.shields.io/badge/userscript-Tampermonkey%20%7C%20Violentmonkey-orange.svg)](docs/publishing.md)
 [![Greasy Fork installs](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgreasyfork.org%2Fscripts%2F602329.json&query=%24.total_installs&label=Greasy%20Fork%20installs&color=brightgreen)](https://greasyfork.org/zh-CN/scripts/602329)
 
-> English: A small collection of MIT-licensed userscripts for everyday sites (X, Threads, Instagram, YouTube). Single-file, no tracking, no backend. Install from the links below or from Greasy Fork once published.
+> English: A small collection of MIT-licensed userscripts for everyday sites (X, Threads, Instagram, YouTube). Single-file, no tracking, no backend. Install from [Greasy Fork](https://greasyfork.org/zh-CN/scripts/602329) or straight from GitHub raw.
 
 [![YouTube 频道视频列表采集器：采集面板与右下角入口按钮](scripts/youtube-channel-videos/screenshot.png)](scripts/youtube-channel-videos/screenshot.png)
 
