@@ -138,9 +138,24 @@ https://raw.githubusercontent.com/wyf0931/oma-userscripts/main/scripts/youtube-c
 
 ### Webhook 状态
 
-- GitHub repo webhook 已配置：`push` 事件 → `https://api.greasyfork.org/zh-CN/users/921270-wyf0931/webhook`（`application/json`，secret 只存在 GitHub 仓库设置里，不入库）
+- GitHub repo webhook 已配置：`push` 事件 → `https://api.greasyfork.org/zh-CN/users/921270-wyf0931/webhook`（`application/json`）
+- 密钥只存在两处：GitHub 仓库的 webhook Secret 字段，以及本地 `.env`（已被 `.gitignore` 忽略，仓库里的 `.env.example` 只有变量名）
 - 验证方式：ping 送达返回 `{"message":"Webhook successfully configured."}`，push 后 Greasy Fork 自动生成新版本
-- 密钥轮换：Greasy Fork 的 Webhook 页面重新生成 secret → 同步更新 GitHub webhook 的 Secret 字段
+
+本地 `.env` 变量：
+
+```bash
+GREASYFORK_WEBHOOK_SECRET=...      # https://greasyfork.org/zh-CN/users/webhook-info 生成
+GREASYFORK_WEBHOOK_URL=https://api.greasyfork.org/zh-CN/users/921270-wyf0931/webhook
+GREASYFORK_WEBHOOK_ID=703453032
+```
+
+密钥轮换（Greasy Fork 重新生成后）：
+
+```bash
+gh api -X PATCH repos/wyf0931/oma-userscripts/hooks/$GREASYFORK_WEBHOOK_ID \
+  -f config[secret]="$GREASYFORK_WEBHOOK_SECRET"
+```
 
 ## 6. 每次发布 Checklist
 

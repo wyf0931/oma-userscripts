@@ -1,6 +1,11 @@
 # dependencies
 node_modules/
 
+# secrets
+.env
+.env.*
+!.env.example
+
 # macOS
 .DS_Store
 
