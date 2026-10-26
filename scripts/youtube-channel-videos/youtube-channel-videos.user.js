@@ -716,3 +716,5 @@
   window.addEventListener('popstate', () => setTimeout(() => { routeChanged(); ensureButton(); }, 300));
   window.addEventListener('yt-navigate-finish', () => setTimeout(() => { routeChanged(); ensureButton(); }, 300));
 })();
+
+// guard self-test (no version bump)
