@@ -7,7 +7,7 @@
  *   npm run verify:live -- --retries 8        # push 后轮询最多 8 次（间隔 15s）
  *   node tools/verify-live.mjs --script youtube-channel-videos
  *
- * 退出码：0 全部一致；1 有脚本落后（同步链路有问题）
+ * 退出码：0 全部一致；1 有脚本版本不一致（同步链路有问题）；2 查询失败（网络/站点问题，无法判断）
  */
 import { readFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
@@ -145,10 +145,17 @@ async function main() {
     await appendFile(summaryPath, `${lines.join('\n')}\n`);
   }
 
-  const behind = results.filter((row) => row.error || row.live !== row.local);
-  if (behind.length) {
-    console.log(`\n有 ${behind.length} 个脚本未与仓库一致：检查 GitHub webhook 与 Greasy Fork 同步状态\n`);
+  const failed = results.filter((row) => row.error);
+  const mismatched = results.filter((row) => !row.error && row.live !== row.local);
+
+  if (mismatched.length) {
+    console.log(`\n有 ${mismatched.length} 个脚本版本不一致：检查 GitHub webhook 与 Greasy Fork 的同步状态\n`);
     process.exitCode = 1;
+    return;
+  }
+  if (failed.length) {
+    console.log(`\n有 ${failed.length} 个脚本查询失败（网络或 Greasy Fork 侧问题），本次无法判断\n`);
+    process.exitCode = 2;
     return;
   }
   console.log('\n全部一致 ✓\n');

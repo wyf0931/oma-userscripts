@@ -9,7 +9,7 @@ on:
     inputs:
       retries:
         description: '轮询次数（每次间隔 15s），push 后想立刻确认可填 8'
-        default: '1'
+        default: '3'
       script:
         description: '只检查某个脚本目录（留空=全部）'
         default: ''
@@ -27,7 +27,16 @@ jobs:
         with:
           node-version: 20
       - name: 比对 Greasy Fork 上的版本
+        # 退出码 2 = 查询失败（网络/站点问题），只告警不失败；版本不一致才失败
         run: |
+          set +e
           node tools/verify-live.mjs \
-            --retries "${{ inputs.retries || '1' }}" \
+            --retries "${{ inputs.retries || '3' }}" \
+            --interval 10 \
             ${{ inputs.script && format('--script {0}', inputs.script) || '' }}
+          code=$?
+          if [ "$code" -eq 2 ]; then
+            echo "::warning::Greasy Fork 查询失败（网络或站点侧问题），本次跳过核对"
+            exit 0
+          fi
+          exit "$code"
