@@ -140,7 +140,8 @@ https://raw.githubusercontent.com/wyf0931/oma-userscripts/main/scripts/youtube-c
 
 - GitHub repo webhook 已配置：`push` 事件 → `https://api.greasyfork.org/zh-CN/users/921270-wyf0931/webhook`（`application/json`）
 - 密钥只存在两处：GitHub 仓库的 webhook Secret 字段，以及本地 `.env`（已被 `.gitignore` 忽略，仓库里的 `.env.example` 只有变量名）
-- 验证方式：ping 送达返回 `{"message":"Webhook successfully configured."}`，push 后 Greasy Fork 自动生成新版本
+- 验证方式：ping 送达返回 `{"message":"Webhook successfully configured."}`；push 后用 `npm run verify:live` 确认线上版本已跟上
+- 定时巡检：`.github/workflows/verify-live.yml` 每周一核对一次线上版本（也可 `gh workflow run verify-live -f retries=8` 手动触发并轮询）
 
 本地 `.env` 变量：
 

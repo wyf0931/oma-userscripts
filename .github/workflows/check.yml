@@ -5,13 +5,38 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: check-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  metadata:
+  validate:
+    name: 校验 metadata / README
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Validate userscripts
+      - name: 校验脚本 metadata 与 registry
         run: npm run check
+      - name: 校验 README 脚本列表是否为最新
+        run: npm run readme:check
+
+  version-bump:
+    name: 校验 @version 已递增
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: 与基线提交比较（代码变了就必须递增版本）
+        env:
+          BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+        run: npm run check:versions -- --base "$BASE"

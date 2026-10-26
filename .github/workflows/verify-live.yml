@@ -1,0 +1,33 @@
+name: verify-live
+
+# 定期核对「仓库里的 @version」是否已经同步到 Greasy Fork，
+# 用来发现 webhook 被删 / secret 轮换后没更新 / 同步一直失败这类静默问题。
+on:
+  schedule:
+    - cron: '0 3 * * 1' # 每周一 03:00 UTC
+  workflow_dispatch:
+    inputs:
+      retries:
+        description: '轮询次数（每次间隔 15s），push 后想立刻确认可填 8'
+        default: '1'
+      script:
+        description: '只检查某个脚本目录（留空=全部）'
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: 线上版本核对
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: 比对 Greasy Fork 上的版本
+        run: |
+          node tools/verify-live.mjs \
+            --retries "${{ inputs.retries || '1' }}" \
+            ${{ inputs.script && format('--script {0}', inputs.script) || '' }}

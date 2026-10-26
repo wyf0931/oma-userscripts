@@ -1,0 +1,11 @@
+version: 2
+updates:
+  # 保持 GitHub Actions 依赖（checkout / setup-node）自动升级
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: chore(ci)
+    labels:
+      - dependencies

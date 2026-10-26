@@ -17,6 +17,7 @@ import vm from 'node:vm';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const SCRIPTS_DIR = join(ROOT, 'scripts');
+const REGISTRY_FILE = join(SCRIPTS_DIR, 'registry.json');
 const TEMPLATE_DIR = '_template';
 
 const REQUIRED_KEYS = ['name', 'namespace', 'version', 'description', 'license'];
@@ -63,6 +64,7 @@ async function main() {
   const warnings = [];
   const rows = [];
   const names = new Map();
+  const scriptDirs = new Set();
 
   for (const file of files) {
     const rel = relative(ROOT, file).replaceAll('\\', '/');
@@ -120,6 +122,11 @@ async function main() {
       else names.set(scriptName, rel);
     }
 
+    if (!isTemplate) {
+      const dir = parts.at(-2);
+      if (dir && dir !== 'scripts') scriptDirs.add(dir);
+    }
+
     try {
       new vm.Script(source, { filename: rel });
     } catch (error) {
@@ -133,6 +140,38 @@ async function main() {
 
     rows.push({ rel, name: scriptName || '(未命名)', version: version || '-' });
   }
+
+  // scripts/registry.json：分发元数据（平台、Greasy Fork id），readme:sync / verify:live 都靠它
+  let registry = {};
+  try {
+    registry = JSON.parse(await readFile(REGISTRY_FILE, 'utf8'));
+  } catch (error) {
+    errors.push(`scripts/registry.json 读取失败 - ${error.message}`);
+  }
+
+  for (const dir of scriptDirs) {
+    const entry = registry[dir];
+    if (!entry) {
+      errors.push(`scripts/registry.json: 缺少脚本 "${dir}" 的条目（至少需要 platform）`);
+      continue;
+    }
+    if (!String(entry.platform || '').trim()) {
+      errors.push(`scripts/registry.json: "${dir}" 缺少 platform`);
+    }
+    const gfId = entry.greasyfork?.id;
+    if (gfId !== undefined && !(Number.isInteger(gfId) && gfId > 0)) {
+      errors.push(`scripts/registry.json: "${dir}".greasyfork.id 必须是正整数（当前 ${JSON.stringify(gfId)}）`);
+    }
+  }
+
+  for (const key of Object.keys(registry)) {
+    if (!scriptDirs.has(key)) {
+      errors.push(`scripts/registry.json: 条目 "${key}" 找不到对应的 scripts/${key}/${key}.user.js`);
+    }
+  }
+
+  const published = Object.entries(registry).filter(([, entry]) => entry.greasyfork?.id).length;
+  if (published) warnings.push(`已上架脚本 ${published} 个；发版后用 npm run verify:live 确认线上版本`);
 
   console.log(`\n发现 ${rows.length} 个脚本：\n`);
   const nameWidth = Math.max(4, ...rows.map((row) => row.name.length));

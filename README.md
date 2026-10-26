@@ -17,12 +17,11 @@
 
 ## 脚本列表
 
+<!-- scripts:start -->
 | 脚本 | 平台 | 功能 | 安装 |
 | --- | --- | --- | --- |
-| [YouTube 频道视频列表采集器](scripts/youtube-channel-videos/) | YouTube | 读取频道「视频」页签中属于该频道的普通视频（自动剔除合辑/播放列表/Shorts/直播/推荐），可复制或导出 Markdown / CSV | [Greasy Fork][yt-gf] · [GitHub][yt-raw] |
-
-[yt-gf]: https://greasyfork.org/zh-CN/scripts/602329-youtube-%E9%A2%91%E9%81%93%E8%A7%86%E9%A2%91%E5%88%97%E8%A1%A8%E9%87%87%E9%9B%86%E5%99%A8
-[yt-raw]: https://raw.githubusercontent.com/wyf0931/oma-userscripts/main/scripts/youtube-channel-videos/youtube-channel-videos.user.js
+| [YouTube 频道视频列表采集器](scripts/youtube-channel-videos/) | YouTube | 只读取 YouTube 频道「视频」页签里属于该频道的普通视频，可复制或导出为 Markdown / CSV 文件 | [Greasy Fork](https://greasyfork.org/zh-CN/scripts/602329) · [GitHub](https://raw.githubusercontent.com/wyf0931/oma-userscripts/main/scripts/youtube-channel-videos/youtube-channel-videos.user.js) |
+<!-- scripts:end -->
 
 > 安装时脚本管理器会弹出确认页，点「安装」即可；首次使用请在 Tampermonkey 的「已安装脚本」里确认已启用。
 
@@ -44,6 +43,7 @@
 ├── AGENTS.md                            # 给 coding agent 的约定 / 领域知识 / 发版流程
 ├── LICENSE
 ├── scripts/
+│   ├── registry.json                    # 分发元数据：平台 / Greasy Fork id（readme:sync、verify:live 的数据源）
 │   ├── youtube-channel-videos/          # 一个脚本一个目录
 │   │   ├── youtube-channel-videos.user.js
 │   │   ├── README.md                    # 功能 / 用法 / 已知限制
@@ -53,9 +53,16 @@
 ├── docs/
 │   └── publishing.md                    # Greasy Fork / OpenUserJS / Userscript.Zone 上架指南
 ├── tools/
-│   └── check-userscripts.mjs            # metadata + 语法检查
+│   ├── check-userscripts.mjs            # metadata / 命名 / registry / 语法校验
+│   ├── check-version-bump.mjs           # 代码变了必须递增 @version
+│   ├── sync-readme.mjs                  # 生成 README 脚本列表（--check 用于 CI）
+│   └── verify-live.mjs                  # 核对 Greasy Fork 上的线上版本
 ├── .env.example                         # 密钥变量名清单（真实值在本地 .env）
-└── .github/workflows/check.yml          # CI：每次 push 校验所有脚本
+└── .github/
+    ├── dependabot.yml                   # Actions 依赖月度升级
+    └── workflows/
+        ├── check.yml                    # push / PR：metadata + README + 版本守卫
+        └── verify-live.yml              # 每周一 + 手动：线上版本核对
 ```
 
 **为什么脚本要放在 `scripts/<名字>/<名字>.user.js`？**
@@ -78,16 +85,31 @@ Greasy Fork 的「从 URL 同步」按 raw 文件路径识别脚本，目录 + �
 > 用 coding agent（Claude Code / Codex / Cursor / pi）改代码的，先读 [AGENTS.md](AGENTS.md)：里面写了硬性约定、每个脚本的领域知识和发版流程。
 
 ```bash
-npm run check   # 校验 metadata、文件命名、版本号、JS 语法
+npm run check                                  # metadata / 命名 / registry / 语法
+npm run readme:sync                            # 新增脚本后重新生成上面的脚本列表
+npm run check:versions -- --base origin/main   # 提交前自检：代码改了版本有没有递增
+npm run verify:live                            # 发版后确认 Greasy Fork 线上版本
 ```
+
+### 自动化（GitHub Actions）
+
+| Workflow | 触发 | 做什么 |
+| --- | --- | --- |
+| `check` / validate | push、PR | `npm run check` + `npm run readme:check` |
+| `check` / version-bump | push、PR | 与基线提交比较，脚本代码变了但 `@version` 没动 → 失败（避免 Greasy Fork 静默不同步） |
+| `verify-live` | 每周一 03:00 UTC、手动 | 比对 `scripts/registry.json` 里的 Greasy Fork id，线上版本落后就失败（webhook 挂了能第一时间发现） |
+| Greasy Fork webhook | push 到 `main` | 自动把新版本发到脚本站（不依赖 Actions） |
+
+新增脚本时只需：写代码 → 在 `scripts/registry.json` 加条目 → `npm run readme:sync` → 提 PR。
 
 新增脚本：
 
 ```bash
 cp -r scripts/_template scripts/my-new-script
 mv scripts/my-new-script/template.user.js scripts/my-new-script/my-new-script.user.js
-# 编辑 metadata 与代码，然后在根 README 的脚本列表里加一行
-npm run check
+# 编辑 metadata 与代码
+# 在 scripts/registry.json 加一条 platform（上架后补 greasyfork.id）
+npm run readme:sync   # README 脚本列表自动生成，不用手改
 ```
 
 ### metadata 约定

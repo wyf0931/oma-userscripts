@@ -30,10 +30,16 @@ scripts/<script-name>/
 ├── <script-name>.user.js     # 唯一入口，文件名必须 = 目录名
 ├── README.md                 # 功能 / 用法 / 已知限制 / 更新日志
 └── screenshot.png            # 可选，README 与 Greasy Fork 展示图
+scripts/registry.json         # 分发元数据：每个脚本的平台 + Greasy Fork id（新增脚本必须加条目）
 scripts/_template/            # 新脚本模板，check 时跳过命名检查
 docs/publishing.md            # 上架与发版手册（Greasy Fork / OpenUserJS / Userscript.Zone）
-tools/check-userscripts.mjs   # metadata + 命名 + semver + 语法校验
-.github/workflows/check.yml   # CI：push / PR 跑 npm run check
+tools/check-userscripts.mjs   # metadata + 命名 + registry + 语法校验
+tools/check-version-bump.mjs  # 代码变了就必须递增 @version
+tools/sync-readme.mjs         # 用 metadata + registry 生成 README 脚本列表
+tools/verify-live.mjs         # 比对 Greasy Fork 线上版本
+.github/workflows/check.yml   # CI：push / PR 跑 check + readme:check + 版本守卫
+.github/workflows/verify-live.yml  # 每周 + 手动：线上版本漂移检测
+.github/dependabot.yml        # Actions 依赖月度升级
 .env                          # 本地密钥（gitignored，勿提交）
 .env.example                  # 变量名清单（已提交）
 ```
@@ -51,14 +57,17 @@ tools/check-userscripts.mjs   # metadata + 命名 + semver + 语法校验
 | 不写 `eval` / `new Function` / 远程加载代码，不用 `@require` 引第三方 JS | 脚本站审核会拒；也违背"无后门"承诺 |
 | UI 文案中文；metadata 用 `@name` + `@name:en`，描述用 `@description` + `@description:en` | 中文用户为主，同时便于英文用户搜索 |
 | 只在目标站点加 UI/增强，不改用户数据、不发网络请求 | 脚本卖点是"轻量、可审计" |
-| 新脚本必须同步更新根 README 的「脚本列表」表 | 那是唯一的入口索引 |
+| 新脚本必须有 `scripts/registry.json` 条目（`platform` 必填，上架后补 `greasyfork.id`） | README 表格与线上版本校验都从它生成/读取 |
+| 根 README 的「脚本列表」不要手改（在 `<!-- scripts:start -->` … `<!-- scripts:end -->` 之间，由 `npm run readme:sync` 生成） | CI 的 `readme:check` 会校验一致性 |
 
 新增脚本：
 
 ```bash
 cp -r scripts/_template scripts/<new-script>
 mv scripts/<new-script>/template.user.js scripts/<new-script>/<new-script>.user.js
-# 改 metadata + 写实现 + 写 README + 根 README 加一行
+# 改 metadata + 写实现 + 写 README
+# 在 scripts/registry.json 加一条：{ "platform": "X" }（上架后补 greasyfork.id）
+npm run readme:sync   # 根 README 脚本列表自动生成
 ```
 
 ---
@@ -66,11 +75,15 @@ mv scripts/<new-script>/template.user.js scripts/<new-script>/<new-script>.user.
 ## 4. 验证要求（提交前必做）
 
 ```bash
-npm run check          # metadata / 文件名 / semver / @name 重复 / JS 语法
-node --check scripts/<name>/<name>.user.js   # 单独语法检查（可选，check 已覆盖）
+npm run check          # metadata / 文件名 / registry / semver / @name 重复 / JS 语法
+npm run readme:check   # 根 README 脚本列表是否与 metadata+registry 一致
+npm run check:versions -- --base origin/main   # 代码变了是否递增了 @version
+node --check scripts/<name>/<name>.user.js     # 单独语法检查（可选，check 已覆盖）
 ```
 
-CI 会在 push 后跑同一份检查（`.github/workflows/check.yml`），红叉等于不可发布。
+CI 会跑前三项（`.github/workflows/check.yml` 的 validate + version-bump 两个 job），红叉等于不可发布。
+
+**改完勾选器一定要跑一次 `check:versions`**：版本没递增不会报任何错，但 Greasy Fork 会认为内容未变而**静默不发版**，这是本项目最容易踩的坑。
 
 ### 在真实页面里验证（强烈建议，尤其是改选择器时）
 
@@ -109,13 +122,15 @@ rm -f .tmp-test.js     # 一定要删，别提交
 ## 5. 发版流程
 
 ```bash
-# 1. 改代码 + 递增 @version + 更新脚本 README 的更新日志
+# 1. 改代码 + 递增 @version + 更新脚本 README 的更新日志 + （若新增脚本）registry 条目
 # 2. 自检
 npm run check
+npm run readme:sync && npm run readme:check
+npm run check:versions -- --base origin/main
 # 3. 提交推送 —— 推送到 main 后 webhook 会让 Greasy Fork 秒级出新版本
-git add -A && git commit -m "feat(youtube): ..." && git push
-# 4. 验证线上版本
-curl -sSL https://greasyfork.org/scripts/602329.json | python3 -c "import json,sys;d=json.load(sys.stdin);print(d['version'], d['code_updated_at'])"
+#    若新增了脚本，还需要先去 Greasy Fork /import 导入一次 raw URL 建立条目
+# 4. 验证线上版本（可加 --retries 8 轮询等待 webhook）
+npm run verify:live
 ```
 
 - 线上脚本 id：`602329`（JSON API 需要 `-L` 跟随 308 跳转）
@@ -202,3 +217,17 @@ curl -sSL https://greasyfork.org/scripts/602329.json | python3 -c "import json,s
 - 计划新增：X（时间线净化 / 去推荐）、Threads、Instagram（去登录墙 / 批量保存）—— 新脚本走 `_template` 目录，先写清"要解决的具体痛点"再动手
 - `amazon-review-collector` 目前是独立仓库，未来可能迁入本合集统一维护
 - OpenUserJS 尚未上架（流程见 `docs/publishing.md`：先在站点手动发布，再挂 GitHub 同步）
+- `scripts/registry.json` 是分发唯一入口：新增脚本 / 上架后补 id；README 表格与 `verify:live` 都读它
+
+---
+
+## 10. 自动化一览
+
+| Workflow | 触发 | 内容 | 失败意味着 |
+| --- | --- | --- | --- |
+| `check` / validate | push、PR | `npm run check`、`npm run readme:check` | metadata/命名/registry/README 不同步 |
+| `check` / version-bump | push、PR | `npm run check:versions --base <基线>` | 代码改了但 `@version` 没递增（Greasy Fork 不会发版） |
+| `verify-live` | 每周一 03:00 UTC、手动 | `tools/verify-live.mjs` | webhook 被删 / secret 轮换后没同步 / 同步长期失败 |
+| Greasy Fork webhook | push 到 `main` | 直接调 Greasy Fork 同步 | —（不走 Actions，不消耗额度） |
+
+`verify-live` 可手动触发并轮询：`gh workflow run verify-live -f retries=8`（等 webhook 落地约 1 分钟）。
