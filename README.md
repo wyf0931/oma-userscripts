@@ -40,16 +40,21 @@
 
 ```
 .
+├── README.md
+├── AGENTS.md                            # 给 coding agent 的约定 / 领域知识 / 发版流程
+├── LICENSE
 ├── scripts/
 │   ├── youtube-channel-videos/          # 一个脚本一个目录
 │   │   ├── youtube-channel-videos.user.js
-│   │   └── README.md                    # 功能 / 用法 / 已知限制
+│   │   ├── README.md                    # 功能 / 用法 / 已知限制
+│   │   └── screenshot.png               # 展示图（README + Greasy Fork）
 │   └── _template/                       # 新脚本模板（不会被安装）
 │       └── template.user.js
 ├── docs/
 │   └── publishing.md                    # Greasy Fork / OpenUserJS / Userscript.Zone 上架指南
 ├── tools/
 │   └── check-userscripts.mjs            # metadata + 语法检查
+├── .env.example                         # 密钥变量名清单（真实值在本地 .env）
 └── .github/workflows/check.yml          # CI：每次 push 校验所有脚本
 ```
 
@@ -69,6 +74,8 @@ Greasy Fork 的「从 URL 同步」按 raw 文件路径识别脚本，目录 + �
 ## 开发
 
 要求 Node.js ≥ 18（仅用于本地校验，运行脚本本身不需要）。
+
+> 用 coding agent（Claude Code / Codex / Cursor / pi）改代码的，先读 [AGENTS.md](AGENTS.md)：里面写了硬性约定、每个脚本的领域知识和发版流程。
 
 ```bash
 npm run check   # 校验 metadata、文件命名、版本号、JS 语法
