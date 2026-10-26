@@ -2,8 +2,11 @@
 
 读取某个 YouTube 频道「视频」页签下**已经加载到页面里**的普通视频，汇总成表格，可复制或导出为 Markdown / CSV。
 
+[![采集面板](screenshot.png)](screenshot.png)
+
+- Greasy Fork（推荐给普通用户，自动更新）：<https://greasyfork.org/zh-CN/scripts/602329>
 - 脚本文件：[youtube-channel-videos.user.js](youtube-channel-videos.user.js)
-- 直装地址：<https://raw.githubusercontent.com/wyf0931/oma-userscripts/main/scripts/youtube-channel-videos/youtube-channel-videos.user.js>
+- GitHub 直装地址：<https://raw.githubusercontent.com/wyf0931/oma-userscripts/main/scripts/youtube-channel-videos/youtube-channel-videos.user.js>
 
 ## 为什么写它
 
@@ -52,7 +55,7 @@
 
 ## 更新日志
 
-- **0.9.2** — 移交到本仓库；补全 metadata（`@name:en`、`@license`、`@homepageURL`、`@supportURL`、`@icon`）
+- **0.9.2** — 移交到本仓库并在 Greasy Fork 上架（2026-10-26）；补全 metadata（`@name:en`、`@license`、`@homepageURL`、`@supportURL`、`@icon`）
 - **0.9.1** — 新增「保存 Markdown / 保存 CSV」（`showSaveFilePicker` 选路径，降级为下载）；CSV 加 BOM
 - **0.9.0** — 修复垃圾内容混入：采集范围收敛到频道「视频」页签、按卡片特征剔除合辑/播放列表/Shorts/直播/推荐；播放量与发布时间改从 aria-label 解析；标题不再被 aria-label 里的时长污染
 - **0.8.0** — 初版：读取当前列表并复制为 Markdown 表格

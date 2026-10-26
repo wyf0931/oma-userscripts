@@ -5,8 +5,13 @@
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![userscript](https://img.shields.io/badge/userscript-Tampermonkey%20%7C%20Violentmonkey-orange.svg)](docs/publishing.md)
+[![Greasy Fork installs](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgreasyfork.org%2Fscripts%2F602329.json&query=%24.total_installs&label=Greasy%20Fork%20installs&color=brightgreen)](https://greasyfork.org/zh-CN/scripts/602329)
 
 > English: A small collection of MIT-licensed userscripts for everyday sites (X, Threads, Instagram, YouTube). Single-file, no tracking, no backend. Install from the links below or from Greasy Fork once published.
+
+[![YouTube 频道视频列表采集器：采集面板与右下角入口按钮](scripts/youtube-channel-videos/screenshot.png)](scripts/youtube-channel-videos/screenshot.png)
+
+> 采集完成后自动去掉合辑 / 播放列表 / Shorts / 直播 / 推荐，只留频道自己的普通视频，并补齐时长、播放量、发布时间；可复制或导出 Markdown / CSV。
 
 ---
 
@@ -14,9 +19,10 @@
 
 | 脚本 | 平台 | 功能 | 安装 |
 | --- | --- | --- | --- |
-| [YouTube 频道视频列表采集器](scripts/youtube-channel-videos/) | YouTube | 读取频道「视频」页签中属于该频道的普通视频（自动剔除合辑/播放列表/Shorts/直播/推荐），可复制或导出 Markdown / CSV | [安装][yt-install] |
+| [YouTube 频道视频列表采集器](scripts/youtube-channel-videos/) | YouTube | 读取频道「视频」页签中属于该频道的普通视频（自动剔除合辑/播放列表/Shorts/直播/推荐），可复制或导出 Markdown / CSV | [Greasy Fork][yt-gf] · [GitHub][yt-raw] |
 
-[yt-install]: https://raw.githubusercontent.com/wyf0931/oma-userscripts/main/scripts/youtube-channel-videos/youtube-channel-videos.user.js
+[yt-gf]: https://greasyfork.org/zh-CN/scripts/602329-youtube-%E9%A2%91%E9%81%93%E8%A7%86%E9%A2%91%E5%88%97%E8%A1%A8%E9%87%87%E9%9B%86%E5%99%A8
+[yt-raw]: https://raw.githubusercontent.com/wyf0931/oma-userscripts/main/scripts/youtube-channel-videos/youtube-channel-videos.user.js
 
 > 安装时脚本管理器会弹出确认页，点「安装」即可；首次使用请在 Tampermonkey 的「已安装脚本」里确认已启用。
 
@@ -24,9 +30,9 @@
 
 | 渠道 | 作用 | 状态 |
 | --- | --- | --- |
-| [Greasy Fork](https://greasyfork.org/) | 最大的脚本站，支持从 GitHub 同步、可被搜索引擎收录 | ⏳ 待上架 |
+| [Greasy Fork](https://greasyfork.org/) | 最大的脚本站，支持从 GitHub 同步、可被搜索引擎收录 | ✅ 已上架 · [YouTube 频道视频列表采集器](https://greasyfork.org/zh-CN/scripts/602329)（2026-10-26，v0.9.2） |
 | [OpenUserJS](https://openuserjs.org/) | 老牌脚本站，支持 GitHub 同步 | ⏳ 待上架 |
-| [Userscript.Zone](https://www.userscript.zone/) | 脚本搜索引擎（索引 GreasyFork 等站点，无上传入口） | ⏳ 随 GreasyFork 收录 |
+| [Userscript.Zone](https://www.userscript.zone/) | 脚本搜索引擎（索引 GreasyFork 等站点，无上传入口） | ⏳ 等待抓取 |
 
 具体步骤见 [docs/publishing.md](docs/publishing.md)。
 

@@ -123,7 +123,20 @@ https://github.com/<user>/<repo>/releases/latest/download/<file>   # 走 release
 
 ---
 
-## 5. 每次发布 Checklist
+## 5. 本次仓库的发布记录
+
+| 脚本 | Greasy Fork | 上架时间 | 版本 |
+| --- | --- | --- | --- |
+| YouTube 频道视频列表采集器 | <https://greasyfork.org/zh-CN/scripts/602329> | 2026-10-26 | 0.9.2 |
+| OpenUserJS / Userscript.Zone | 待上架 / 等抓取 | – | – |
+
+导入时填的同步 URL：
+
+```
+https://raw.githubusercontent.com/wyf0931/oma-userscripts/main/scripts/youtube-channel-videos/youtube-channel-videos.user.js
+```
+
+## 6. 每次发布 Checklist
 
 ```bash
 # 1. 改代码 + 递增 @version
@@ -143,7 +156,7 @@ git add -A && git commit -m "feat(youtube): ..." && git push
 
 ---
 
-## 6. 参考资料
+## 7. 参考资料
 
 - Greasy Fork 元数据键说明：<https://greasyfork.org/en/help/meta-keys>
 - Greasy Fork 脚本导入：<https://greasyfork.org/import>
