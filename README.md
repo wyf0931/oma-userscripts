@@ -30,7 +30,7 @@
 
 | 渠道 | 作用 | 状态 |
 | --- | --- | --- |
-| [Greasy Fork](https://greasyfork.org/) | 最大的脚本站，支持从 GitHub 同步、可被搜索引擎收录 | ✅ 已上架 · [YouTube 频道视频列表采集器](https://greasyfork.org/zh-CN/scripts/602329)（2026-10-26，v0.9.2） |
+| [Greasy Fork](https://greasyfork.org/) | 最大的脚本站，支持从 GitHub 同步、可被搜索引擎收录 | ✅ 已上架 · [YouTube 频道视频列表采集器](https://greasyfork.org/zh-CN/scripts/602329)（2026-10-26 上架，当前 v0.9.3） |
 | [OpenUserJS](https://openuserjs.org/) | 老牌脚本站，支持 GitHub 同步 | ⏳ 待上架 |
 | [Userscript.Zone](https://www.userscript.zone/) | 脚本搜索引擎（索引 GreasyFork 等站点，无上传入口） | ⏳ 等待抓取 |
 

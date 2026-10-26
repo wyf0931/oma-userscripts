@@ -127,7 +127,7 @@ https://github.com/<user>/<repo>/releases/latest/download/<file>   # 走 release
 
 | 脚本 | Greasy Fork | 上架时间 | 版本 |
 | --- | --- | --- | --- |
-| YouTube 频道视频列表采集器 | <https://greasyfork.org/zh-CN/scripts/602329> | 2026-10-26 | 0.9.2 |
+| YouTube 频道视频列表采集器 | <https://greasyfork.org/zh-CN/scripts/602329> | 2026-10-26 | 0.9.3 |
 | OpenUserJS / Userscript.Zone | 待上架 / 等抓取 | – | – |
 
 导入时填的同步 URL：
@@ -135,6 +135,12 @@ https://github.com/<user>/<repo>/releases/latest/download/<file>   # 走 release
 ```
 https://raw.githubusercontent.com/wyf0931/oma-userscripts/main/scripts/youtube-channel-videos/youtube-channel-videos.user.js
 ```
+
+### Webhook 状态
+
+- GitHub repo webhook 已配置：`push` 事件 → `https://api.greasyfork.org/zh-CN/users/921270-wyf0931/webhook`（`application/json`，secret 只存在 GitHub 仓库设置里，不入库）
+- 验证方式：ping 送达返回 `{"message":"Webhook successfully configured."}`，push 后 Greasy Fork 自动生成新版本
+- 密钥轮换：Greasy Fork 的 Webhook 页面重新生成 secret → 同步更新 GitHub webhook 的 Secret 字段
 
 ## 6. 每次发布 Checklist
 

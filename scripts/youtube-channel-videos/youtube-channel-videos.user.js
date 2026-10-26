@@ -2,7 +2,7 @@
 // @name         YouTube 频道视频列表采集器
 // @name:en      YouTube Channel Video Collector
 // @namespace    https://github.com/wyf0931/oma-userscripts
-// @version      0.9.2
+// @version      0.9.3
 // @description  只读取 YouTube 频道「视频」页签里属于该频道的普通视频，可复制或导出为 Markdown / CSV 文件
 // @description:en  Read the ordinary videos of the current channel's Videos tab and copy or export them as Markdown / CSV.
 // @author       wyf0931
@@ -440,6 +440,13 @@
     });
   }
 
+  // 已采集视频的发布时间跨度（YYYY-MM ~ YYYY-MM），用于状态栏概览
+  function publishedRange() {
+    const dates = [...state.videos.values()].map((video) => video.published).filter(Boolean).sort();
+    if (!dates.length) return null;
+    return [dates[0], dates[dates.length - 1]];
+  }
+
   function escapeMarkdown(value) {
     return String(value || '').replace(/\\/g, '\\\\').replace(/\|/g, '\\|').replace(/\r?\n/g, '<br>');
   }
@@ -652,8 +659,10 @@
       setStatus('正在读取当前已加载的视频…');
       collectAll();
       renderTable();
-      const skipped = state.skipped ? `，已跳过 ${state.skipped} 个非视频条目（合辑/播放列表/直播/推荐）` : '';
-      setStatus(`完成：读取到 ${state.videos.size} 个普通视频${skipped}`);
+      const range = publishedRange();
+      const rangeText = range ? `（发布时间 ${range[0]} ~ ${range[1]}）` : '';
+      const skipped = state.skipped ? `，已跳过 ${state.skipped} 个非视频条目（合辑/播放列表/Shorts/直播/推荐）` : '';
+      setStatus(`完成：读取到 ${state.videos.size} 个普通视频${rangeText}${skipped}`);
     } catch (error) {
       renderTable();
       setStatus(`采集遇到问题：${error.message || '未知错误'}；已保留已发现的 ${state.videos.size} 个视频`);

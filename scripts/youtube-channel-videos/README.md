@@ -55,6 +55,7 @@
 
 ## 更新日志
 
+- **0.9.3** — 状态栏增加发布时间跨度概览（如 `2024-01 ~ 2026-10`）；补充 Shorts 到跳过条目说明
 - **0.9.2** — 移交到本仓库并在 Greasy Fork 上架（2026-10-26）；补全 metadata（`@name:en`、`@license`、`@homepageURL`、`@supportURL`、`@icon`）
 - **0.9.1** — 新增「保存 Markdown / 保存 CSV」（`showSaveFilePicker` 选路径，降级为下载）；CSV 加 BOM
 - **0.9.0** — 修复垃圾内容混入：采集范围收敛到频道「视频」页签、按卡片特征剔除合辑/播放列表/Shorts/直播/推荐；播放量与发布时间改从 aria-label 解析；标题不再被 aria-label 里的时长污染
