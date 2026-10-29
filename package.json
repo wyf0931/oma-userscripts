@@ -2,7 +2,7 @@
   "name": "oma-userscripts",
   "version": "0.1.0",
   "private": true,
-  "description": "Everyday browser enhancements for X, Threads, Instagram & YouTube — Tampermonkey / Violentmonkey userscripts",
+  "description": "Everyday browser enhancements for X, Threads, Instagram, YouTube & Xiaohongshu — Tampermonkey / Violentmonkey userscripts",
   "license": "MIT",
   "author": "Scott Wang (wyf0931)",
   "homepage": "https://github.com/wyf0931/oma-userscripts",

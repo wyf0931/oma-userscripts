@@ -1,13 +1,13 @@
 # OMA Userscripts
 
-日常网站的轻量增强脚本合集：**X / Threads / Instagram / YouTube** 等常用平台。
+日常网站的轻量增强脚本合集：**X / Threads / Instagram / YouTube / 小红书** 等常用平台。
 每个脚本都是单文件 `.user.js`，配合 Tampermonkey / Violentmonkey / Userscripts(Safari) 使用，**不采集任何数据、不联网上报、不依赖后端**。
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![userscript](https://img.shields.io/badge/userscript-Tampermonkey%20%7C%20Violentmonkey-orange.svg)](docs/publishing.md)
 [![Greasy Fork installs](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgreasyfork.org%2Fscripts%2F602329.json&query=%24.total_installs&label=Greasy%20Fork%20installs&color=brightgreen)](https://greasyfork.org/zh-CN/scripts/602329)
 
-> English: A small collection of MIT-licensed userscripts for everyday sites (X, Threads, Instagram, YouTube). Single-file, no tracking, no backend. Install from [Greasy Fork](https://greasyfork.org/zh-CN/scripts/602329) or straight from GitHub raw.
+> English: A small collection of MIT-licensed userscripts for everyday sites (X, Threads, Instagram, YouTube, Xiaohongshu). Single-file, no tracking, no backend. Install from [Greasy Fork](https://greasyfork.org/zh-CN/scripts/602329) or straight from GitHub raw.
 
 [![YouTube 频道视频列表采集器：采集面板与右下角入口按钮](scripts/youtube-channel-videos/screenshot.png)](scripts/youtube-channel-videos/screenshot.png)
 
@@ -20,6 +20,7 @@
 <!-- scripts:start -->
 | 脚本 | 平台 | 功能 | 安装 |
 | --- | --- | --- | --- |
+| [小红书 AI 对话 Markdown 复制器](scripts/xiaohongshu-ai-copy/) | 小红书 | 悬停小红书「点点」的消息复制 AI 回复的 Markdown 原文，也可以一键复制整个对话 | Greasy Fork（待上架） · [GitHub](https://raw.githubusercontent.com/wyf0931/oma-userscripts/main/scripts/xiaohongshu-ai-copy/xiaohongshu-ai-copy.user.js) |
 | [YouTube 频道视频列表采集器](scripts/youtube-channel-videos/) | YouTube | 只读取 YouTube 频道「视频」页签里属于该频道的普通视频，可复制或导出为 Markdown / CSV 文件 | [Greasy Fork](https://greasyfork.org/zh-CN/scripts/602329) · [GitHub](https://raw.githubusercontent.com/wyf0931/oma-userscripts/main/scripts/youtube-channel-videos/youtube-channel-videos.user.js) |
 <!-- scripts:end -->
 

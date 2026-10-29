@@ -20,6 +20,7 @@
 | 目录 | 作用 | 版本 |
 | --- | --- | --- |
 | `scripts/youtube-channel-videos/` | 采集频道「视频」页签的普通视频，导出 Markdown / CSV | 0.9.3 |
+| `scripts/xiaohongshu-ai-copy/` | 小红书「点点」对话：悬停消息复制 AI 回复的 Markdown 原文 | 0.1.0 |
 
 ---
 
@@ -190,6 +191,70 @@ npm run verify:live
 
 ---
 
+## 6.1 领域知识：小红书 AI 对话 Markdown 复制器
+
+**DOM（2026-10 现状）**
+
+```
+.round-item
+├── .user-message > .user-message__text           # 用户提问（纯文本，white-space: pre-wrap）
+└── .xhs-ai-message-copy-wrapper
+    └── .ai-message
+        ├── .progress-wrapper                     # "ai总结84篇笔记生成"
+        └── .xhs-ai-md-container
+            └── .markdown-block[data-original-text]  # Markdown 原文就在属性里
+```
+
+- AI 回复的原文只存在于 `data-original-text`；`innerHTML` 是渲染结果，别从 HTML 反推 Markdown
+- 用户消息没有原文，只能取 `.user-message__text` 的 `innerText`（首尾空白要自己裁掉）
+- 原文里夹着零宽字符（`\u200b` 等），复制前必须剔除
+- 小红书自己也有一套 hover 操作条（`.xhs-ai-copy-bar` / `.xhs-user-copy-bar`，在 CSS 里、快照中不一定渲染），别和它抢位置
+
+**UI 决策**
+
+- 复制按钮是挂在 `body` 上的**单例浮层**，不插入 Vue 管理的节点：流式输出时组件频繁重渲染，插进去的 DOM 会被 patch 掉
+- 单条按钮：用 `pointermove` 找最近的 `.xhs-ai-md-container` / `.user-message`，`getBoundingClientRect()` 定位到**消息底边下方 2px、右边对齐**（与消息相接，不压住正文）；滚动、缩放、流式增长时每 250ms 重新贴合
+- 用户消息的定位基准是 `.user-message__text`（带背景气泡的那个），**不是 `.user-message`**：后者自带 20px `padding-bottom`（`[data-v-2b34b584] .user-message{padding-bottom:20px}`），直接用会低 22px、压到下一轮消息；图片消息退化为 `.user-message` rect 减 padding
+- 消息比视口长时先钳到视口底部，再避开浮在底部的 `.input-container`（否则按钮会压在输入框上）
+- 整段按钮：固定在 `.sticky-title-container`（标题栏）右侧 16px、垂直居中；只在存在 `.xhs-ai-chat-page` 且有 `.round-item`/`.ai-message` 时显示
+- 成功提示贴在触发按钮附近（按钮在顶部时放下方），不放在底部（底部是输入框）
+
+**整段对话格式（0.2.0 起固定）**
+
+```text
+user input: <用户原文>
+
+assistant:
+
+<markdown 原文>
+
+user input: ...
+
+assistant:
+
+...
+```
+
+- 按 `.round-item` 的 DOM 顺序导出；一轮多个 `.ai-message` 合并进同一个 `assistant:` 块
+- 只导出已加载的轮次（不自动滚动），空消息跳过；用户提问没有 Markdown 原文，用 `innerText`
+
+**验证方式（无真实站点时）**
+
+```bash
+# 把 temp/xiaohongshu-chat.html 的快照去掉 <script> 再注入脚本，用 chrome-devtools MCP 断言
+python3 - <<'EOF'
+import re
+src = open('temp/xiaohongshu-chat.html', encoding='utf-8').read()
+open('.tmp-xhs-test.html','w',encoding='utf-8').write(re.sub(r'<script\b[^>]*>.*?</script>', '', src, flags=re.S))
+EOF
+# evaluate_script sourcePath=scripts/xiaohongshu-ai-copy/xiaohongshu-ai-copy.user.js format=script
+# 断言：单条 hover 后按钮在消息下方 2px（topGap=2, rightGap=0）、copy 含 #### 且无零宽字符、离开后隐藏
+#      整段按钮在标题栏右侧（rightInset=16）、copy 以 user input: 开头并含 assistant:、移除 .xhs-ai-chat-page 后隐藏
+rm -f .tmp-xhs-test.html
+```
+
+---
+
 ## 7. 踩过的坑
 
 | 坑 | 表现 | 处理 |
@@ -198,6 +263,7 @@ npm run verify:live
 | chrome-devtools MCP 截图可能是冻结帧 | 截图里看不到刚插入的 UI，但 DOM 里明明有 | 相信 DOM/状态断言（`getBoundingClientRect`、`querySelector`），别只看截图 |
 | YouTube 是 SPA | 换页后脚本状态、按钮、面板残留 | 监听 `yt-navigate-finish` + `popstate`，MutationObserver 节流 400ms；路由变化时清空 `state.videos` 并关面板 |
 | `ytd-browse.data` 缺省 | 拿不到页签数据 | 先 `data.contents`，再 `data.response`，最后才用校验过的 `window.ytInitialData` |
+| 小红书 `.user-message` 有 20px `padding-bottom` | 复制按钮定位偏低，压到下一轮 AI 消息 | 用户消息用 `.user-message__text`（气泡）的 rect 定位；图片消息减掉 padding |
 | 面板"重新读取"在别的页面被点 | 采到搜索页的内容（历史 bug 的成因） | 所有采集入口都要过 `onChannelVideosPage()` 守卫 |
 | 改了本地目录名 | pi/codemode 的 `getcwd()` 报 `ENOENT: uv_cwd` | 别在运行中 rename 会话 cwd；换路径后重开会话 |
 
